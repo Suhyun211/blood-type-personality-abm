@@ -41,10 +41,9 @@ venv.bak/
 .DS_Store
 Thumbs.db
 
-# Temporary working files
-make_docx_paper1.py
-paper/*_updated.docx
-paper/paper_blood_type_personality.md
+# Manuscript and local builder files (keep repository code-clean and blinded)
+paper/
+make_docx_*.py
 jasss_*.txt
 jasss_*.html
 src/peer_review_report.md

@@ -47,15 +47,11 @@ blood-type-personality-abm/
 │   ├── experiment7_sensitivity_robustness.csv # Symmetric scales & bidirectional mate choice
 │   ├── anova_results.csv                  # Complete 2-Way Factorial ANOVA table
 │   └── summary_metrics.csv                # Exact empirical metrics for Table 1
-├── figures/                               # Clean figures (strictly <= 800px width, no in-image text)
-│   ├── fig1_assortative_mating.png
-│   ├── fig2_population_stratification.png
-│   ├── fig3_social_feedback.png
-│   └── fig4_model_comparisons.png
-└── paper/
-    ├── Manuscript_JASSS_Full.docx          # Full submission manuscript
-    ├── Manuscript_JASSS_Anonymised.docx    # Blinded manuscript for peer review
-    └── figures_JASSS.zip                  # Packaged figures archive for JASSS upload
+└── figures/                               # Clean figures (strictly <= 800px width, no in-image text)
+    ├── fig1_assortative_mating.png
+    ├── fig2_population_stratification.png
+    ├── fig3_social_feedback.png
+    └── fig4_model_comparisons.png
 ```
 
 ---
@@ -110,9 +106,6 @@ python src/simulation.py
 
 # Step 2: Run ANOVA, generate figures, and calculate summary metrics
 python src/analytics.py
-
-# Step 3: Compile Word manuscripts (both full and blinded versions)
-python make_docx_paper1_jasss.py
 ```
 
 ---
