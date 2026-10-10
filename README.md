@@ -75,7 +75,7 @@ $$
 Clone this repository and install dependencies:
 
 ```bash
-git clone https://github.com/suhyun-research/blood-type-personality-abm.git
+git clone https://github.com/Suhyun211/blood-type-personality-abm.git
 cd blood-type-personality-abm
 pip install -r requirements.txt
 ```
