@@ -111,14 +111,14 @@ python src/analytics.py
 
 ## 📊 Summary of Key Findings
 
-| Experimental Condition                          |                                                                 Generation 25 Correlation ($r$)                                                                 | Cohen's$d$ ($B$ vs $A$) | Explained Variance ($R^2$) |                              Theoretical Verdict                              |                                                                    |
-| :---------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------: | :---------------------------------------------------------------------------: | :----------------------------------------------------------------- |
-| **Null Control** ($\alpha=0, \beta=0$)  |                                                                       $-0.003 \pm 0.014$                                                                       |                     $-0.006 \pm 0.032$                     |                                  $0.00\%$                                  | Theorem 1 Confirmed: Parallel transmission preserves independence  |
-| **Assortative Mating** ($\alpha = 0.2$) |                                                                        $0.031 \pm 0.015$                                                                        |                     $0.072 \pm 0.035$                     |                                  $0.10\%$                                  | Sub-benchmark: Mating preference alone is insufficient             |
-| **Assortative Mating** ($\alpha = 0.8$) |                                                                        $0.145 \pm 0.006$                                                                        |                     $0.342 \pm 0.014$                     |                                  $2.10\%$                                  | Exceeds benchmark only under implausibly severe social constraints |
-| **Stratification** ($\Delta = 0.5$)     |                                                                       $-0.007 \pm 0.013$                                                                       |                     $-0.016 \pm 0.030$                     |                                  $0.00\%$                                  | Dissipates within 3–5 generations under panmictic mixing          |
-| **Social Feedback** ($\beta = 0.25$)    |                                                                        $0.193 \pm 0.021$                                                                        |                     $0.463 \pm 0.046$                     | $3.72\%$ | Rapid, quasi-instantaneous convergence ($d \to 2\beta = 0.50$) |                                                                    |
-| **Coupled Illustrative Model**            | **$0.108 \pm 0.020$** | **$0.251 \pm 0.045$** | **$1.17\%$** | **Aligns with Cohen's (1988) small-effect benchmark ($r = 0.10$)** |                                                              |                                                                              |                                                                    |
+| Experimental Condition | Generation 25 Correlation (*r*) | Cohen's *d* (*B* vs *A*) | Explained Variance (*R*²) | Theoretical Verdict |
+| :--- | :---: | :---: | :---: | :--- |
+| **Null Control** (α = 0, β = 0) | -0.003 ± 0.014 | -0.006 ± 0.032 | 0.00% | Theorem 1 Confirmed: Parallel transmission preserves independence |
+| **Assortative Mating** (α = 0.2) | 0.031 ± 0.015 | 0.072 ± 0.035 | 0.10% | Sub-benchmark: Mating preference alone is insufficient |
+| **Assortative Mating** (α = 0.8) | 0.145 ± 0.006 | 0.342 ± 0.014 | 2.10% | Exceeds benchmark only under implausibly severe social constraints |
+| **Stratification** (Δ = 0.5) | -0.007 ± 0.013 | -0.016 ± 0.030 | 0.00% | Dissipates within 3–5 generations under panmictic mixing |
+| **Social Feedback** (β = 0.25) | 0.193 ± 0.021 | 0.463 ± 0.046 | 3.72% | Rapid, quasi-instantaneous convergence (*d* → 2β = 0.50) |
+| **Coupled Illustrative Model** | **0.108 ± 0.020** | **0.251 ± 0.045** | **1.17%** | **Aligns with Cohen's (1988) small-effect benchmark (*r* = 0.10)** |
 
 ---
 
