@@ -41,12 +41,13 @@ venv.bak/
 .DS_Store
 Thumbs.db
 
-# Manuscript working / temporary files (keep repository code-clean)
-paper/*.docx
-paper/*.zip
+# Temporary working files
+make_docx_paper1.py
+paper/*_updated.docx
 paper/paper_blood_type_personality.md
 jasss_*.txt
 jasss_*.html
-make_docx_*.py
 src/peer_review_report.md
+chatgpt_*.md
+chatgpt_*.txt
 
