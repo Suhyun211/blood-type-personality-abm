@@ -200,7 +200,8 @@ def run_simulation(
 
     for rep, c_seed in enumerate(child_seeds):
         rng = np.random.default_rng(c_seed)
-        seed_id = int(c_seed.entropy) if hasattr(c_seed, 'entropy') else rep
+        seed_id = int(c_seed.generate_state(1)[0]) if hasattr(c_seed, 'generate_state') else rep
+        spawn_key = str(c_seed.spawn_key) if hasattr(c_seed, 'spawn_key') else str(rep)
 
         # Initialize Population
         if not stratification:
@@ -263,6 +264,7 @@ def run_simulation(
             results.append({
                 'rep': rep,
                 'seed': seed_id,
+                'spawn_key': spawn_key,
                 'gen': gen,
                 'experiment': experiment_label,
                 'corr': r_P,
@@ -310,7 +312,8 @@ def run_belief_withdrawal_experiment(num_reps=5, child_seeds=None):
         # We spawn separate generators for the branches to ensure fair comparison
         sub_seeds = cs.spawn(4)
         rng_early = np.random.default_rng(sub_seeds[0])
-        seed_id = int(cs.entropy) if hasattr(cs, 'entropy') else rep
+        seed_id = int(cs.generate_state(1)[0]) if hasattr(cs, 'generate_state') else rep
+        spawn_key = str(cs.spawn_key) if hasattr(cs, 'spawn_key') else str(rep)
         
         pop = Population(size=5000, h2=0.5, rng=rng_early)
         
@@ -328,6 +331,7 @@ def run_belief_withdrawal_experiment(num_reps=5, child_seeds=None):
             early_records.append({
                 'rep': rep,
                 'seed': seed_id,
+                'spawn_key': spawn_key,
                 'gen': g,
                 'corr': r_P,
                 'corr_genetic': r_G,
@@ -366,6 +370,7 @@ def run_belief_withdrawal_experiment(num_reps=5, child_seeds=None):
                 records.append({
                     'rep': rep,
                     'seed': seed_id,
+                    'spawn_key': spawn_key,
                     'gen': g,
                     'scenario': sc_name,
                     'corr': r_P,
@@ -531,9 +536,10 @@ def main():
     # -------------------------------------------------------------
     # 6. Experiment 6: Belief Withdrawal and Generational Inertia
     # -------------------------------------------------------------
-    print("\n[*] Executing Experiment 6: Belief Withdrawal & Generational Inertia...")
-    exp6_seeds = exp_seeds[5].spawn(num_reps)
-    df_exp6 = run_belief_withdrawal_experiment(num_reps=num_reps, child_seeds=exp6_seeds)
+    print("\n[*] Executing Experiment 6: Belief Withdrawal & Generational Inertia (N = 20 MC runs)...")
+    exp6_reps = 20
+    exp6_seeds = exp_seeds[5].spawn(exp6_reps)
+    df_exp6 = run_belief_withdrawal_experiment(num_reps=exp6_reps, child_seeds=exp6_seeds)
     exp6_path = os.path.join(data_dir, "experiment6_belief_withdrawal.csv")
     df_exp6.to_csv(exp6_path, index=False)
     print(f"  -> Saved {len(df_exp6)} records to: {exp6_path}")

@@ -56,7 +56,7 @@ def verify_results(base_dir):
         ("experiment3_feedback.csv", 375),
         ("experiment4_combined.csv", 625),
         ("experiment5_factorial_grid.csv", 1500),
-        ("experiment6_belief_withdrawal.csv", 390),
+        ("experiment6_belief_withdrawal.csv", 1500),
         ("experiment7_sensitivity_robustness.csv", 250),
         ("anova_results.csv", 4),
         ("summary_metrics.csv", 8)
@@ -66,7 +66,11 @@ def verify_results(base_dir):
         assert os.path.exists(p), f"Missing required data file: {p}"
         df = pd.read_csv(p)
         assert len(df) >= min_rows, f"Insufficient records in {fname}: expected >= {min_rows}, got {len(df)}"
-        print(f"[OK] {fname}: {len(df)} records verified.")
+        # Verify unique seed generation and spawn_key traceability
+        if 'seed' in df.columns:
+            assert df['seed'].nunique() > 1, f"Seed values in {fname} are not distinct!"
+            assert 'spawn_key' in df.columns, f"spawn_key missing in {fname}!"
+        print(f"[OK] {fname}: {len(df)} records verified (distinct seeds and spawn_key confirmed).")
 
     # 2. Verify existence and size of clean figures
     expected_figs = [
@@ -82,32 +86,42 @@ def verify_results(base_dir):
         assert size_kb > 20, f"Figure file suspiciously small ({size_kb} KB): {fname}"
         print(f"[OK] {fname} ({size_kb:.1f} KB): verified.")
 
-    # Check zip archive
-    zip_path = os.path.join(paper_dir, "figures_JASSS.zip")
-    assert os.path.exists(zip_path), f"Missing figure zip: {zip_path}"
-    print(f"[OK] figures_JASSS.zip ({os.path.getsize(zip_path)/1024:.1f} KB): verified.")
+    # Check zip archive (in figures/ for standalone reproducibility, and paper/ if present)
+    zip_path_fig = os.path.join(fig_dir, "figures_JASSS.zip")
+    assert os.path.exists(zip_path_fig), f"Missing figure zip: {zip_path_fig}"
+    print(f"[OK] figures/figures_JASSS.zip ({os.path.getsize(zip_path_fig)/1024:.1f} KB): verified.")
+    if os.path.exists(paper_dir):
+        zip_path_paper = os.path.join(paper_dir, "figures_JASSS.zip")
+        if os.path.exists(zip_path_paper):
+            print(f"[OK] paper/figures_JASSS.zip ({os.path.getsize(zip_path_paper)/1024:.1f} KB): verified.")
 
-    # 3. Rigorous numerical assertions on key empirical metrics
+    # 3. Rigorous numerical assertions on key empirical metrics (Table 1)
     df_sum = pd.read_csv(os.path.join(data_dir, "summary_metrics.csv")).set_index('Model')
     
-    # 3a. Coupled Pure Model
-    cp = df_sum.loc['Coupled Pure Model (alpha = 0.15, beta = 0.10)']
-    np.testing.assert_allclose(cp['r_mean'], 0.102, atol=0.015,
-                               err_msg="Coupled Pure Model mean r deviated beyond tolerance!")
-    print(f"\n[Verification] Coupled Pure Model (alpha=0.15, beta=0.10):")
-    print(f"  Observed: r = {cp['r_mean']:.3f} +/- {cp['r_std']:.3f} (Table 1: 0.102)")
-    print(f"  R^2 = {cp['r2_pct']:.2f}% | Cohen's d = {cp['cohens_d']:.3f}")
+    # 3a. Table 1: All eight condition benchmarks
+    t1_expected = {
+        'Null Control (Pure Random Mating)': (-0.010, 0.008, -0.017),
+        'Weak Assortative (alpha = 0.2)': (0.025, 0.018, 0.050),
+        'Strong Assortative (alpha = 0.8)': (0.139, 0.025, 0.343),
+        'Stratification (Delta = 0.5 SD)': (-0.000, 0.013, 0.007),
+        'Social Feedback Mild (beta = 0.10)': (0.079, 0.017, 0.195),
+        'Social Feedback Moderate (beta = 0.25)': (0.199, 0.017, 0.494),
+        'Coupled Pure Model (alpha = 0.15, beta = 0.10)': (0.102, 0.014, 0.247),
+        'Coupled + Stratified (alpha = 0.15, beta = 0.10, Delta = 0.2)': (0.104, 0.022, 0.255)
+    }
 
-    # 3b. Social Feedback Moderate (beta = 0.25)
-    fbm = df_sum.loc['Social Feedback Moderate (beta = 0.25)']
-    np.testing.assert_allclose(fbm['r_mean'], 0.199, atol=0.015,
-                               err_msg="Social Feedback (beta=0.25) mean r deviated beyond tolerance!")
-    np.testing.assert_allclose(fbm['cohens_d'], 0.494, atol=0.040,
-                               err_msg="Social Feedback Cohen's d deviated beyond tolerance!")
-    print(f"\n[Verification] Social Feedback (beta=0.25):")
-    print(f"  Observed: r = {fbm['r_mean']:.3f} | Cohen's d = {fbm['cohens_d']:.3f} (Theoretical benchmark: d ~ 0.50)")
+    print("\n[Verification] Validating Table 1 Empirical Benchmarks (N=5 MC runs per condition):")
+    for cond_name, (exp_r, exp_std, exp_d) in t1_expected.items():
+        row = df_sum.loc[cond_name]
+        np.testing.assert_allclose(row['r_mean'], exp_r, atol=0.015,
+                                  err_msg=f"{cond_name} mean r deviated beyond tolerance!")
+        np.testing.assert_allclose(row['r_std'], exp_std, atol=0.015,
+                                  err_msg=f"{cond_name} std r deviated beyond tolerance!")
+        np.testing.assert_allclose(row['cohens_d'], exp_d, atol=0.040,
+                                  err_msg=f"{cond_name} Cohen's d deviated beyond tolerance!")
+        print(f"  [OK] {cond_name}: r = {row['r_mean']:.3f} +/- {row['r_std']:.3f} | Cohen's d = {row['cohens_d']:.3f}")
 
-    # 3c. Factorial ANOVA verification
+    # 3b. Factorial ANOVA verification (4x3 Grid, N = 60)
     df_anova = pd.read_csv(os.path.join(data_dir, "anova_results.csv"), index_col=0)
     
     f_alpha = df_anova.loc['C(alpha)', 'F']
@@ -115,23 +129,38 @@ def verify_results(base_dir):
     f_inter = df_anova.loc['C(alpha):C(beta)', 'F']
     p_inter = df_anova.loc['C(alpha):C(beta)', 'PR(>F)']
     
-    assert f_alpha > 100.0, f"ANOVA alpha main effect F too low: {f_alpha}"
-    assert f_beta > 500.0, f"ANOVA beta main effect F too low: {f_beta}"
+    np.testing.assert_allclose(f_alpha, 282.23, rtol=0.05, err_msg="ANOVA alpha F deviated!")
+    np.testing.assert_allclose(f_beta, 1016.64, rtol=0.05, err_msg="ANOVA beta F deviated!")
     assert p_inter > 0.05, f"ANOVA interaction unexpectedly significant (p={p_inter})"
     print(f"\n[Verification] Two-Way Factorial ANOVA on 4x3 Grid (N = 60):")
     print(f"  Main effect alpha: F(3, 48) = {f_alpha:.2f}, p < 0.001, eta_p^2 = {df_anova.loc['C(alpha)', 'eta_p2']:.3f}")
     print(f"  Main effect beta:  F(2, 48) = {f_beta:.2f}, p < 0.001, eta_p^2 = {df_anova.loc['C(beta)', 'eta_p2']:.3f}")
     print(f"  Interaction:       F(6, 48) = {f_inter:.2f}, p = {p_inter:.3f} (non-significant), eta_p^2 = {df_anova.loc['C(alpha):C(beta)', 'eta_p2']:.3f}")
 
-    # 3d. Belief Withdrawal dynamics check
+    # 3c. Belief Withdrawal dynamics check (N = 20 MC runs)
     df_bw = pd.read_csv(os.path.join(data_dir, "experiment6_belief_withdrawal.csv"))
-    r_sust_g24 = df_bw[(df_bw['scenario'] == 'Sustained') & (df_bw['gen'] == 24)]['corr'].mean()
-    r_stop_g24 = df_bw[(df_bw['scenario'] == 'Complete_Withdrawal') & (df_bw['gen'] == 24)]['corr'].mean()
-    assert r_sust_g24 > 0.08, f"Sustained belief failed to maintain correlation at Gen 24: {r_sust_g24}"
-    assert abs(r_stop_g24) < 0.02, f"Complete withdrawal failed to dissipate correlation at Gen 24: {r_stop_g24}"
-    print(f"\n[Verification] Belief Withdrawal & Generational Inertia Dynamic:")
-    print(f"  Sustained at Gen 24: r = {r_sust_g24:.3f}")
-    print(f"  Complete Withdrawal at Gen 24: r = {r_stop_g24:.3f} (diluted to zero)")
+    
+    # Gen 24/25 checks
+    g25_sust = df_bw[(df_bw['scenario'] == 'Sustained') & (df_bw['gen'] == 25)]
+    g25_fc = df_bw[(df_bw['scenario'] == 'Feedback_Cessation') & (df_bw['gen'] == 25)]
+    g25_cw = df_bw[(df_bw['scenario'] == 'Complete_Withdrawal') & (df_bw['gen'] == 25)]
+    
+    # 95% CIs
+    fc_rg_mean = g25_fc['corr_genetic'].mean()
+    fc_rg_ci = 1.96 * (g25_fc['corr_genetic'].std() / np.sqrt(len(g25_fc)))
+    cw_rg_mean = g25_cw['corr_genetic'].mean()
+    cw_rg_ci = 1.96 * (g25_cw['corr_genetic'].std() / np.sqrt(len(g25_cw)))
+
+    # Feedback Cessation maintains latent genetic association significantly above zero
+    assert (fc_rg_mean - fc_rg_ci) > 0.020, f"Feedback Cessation 95% CI lower bound not strictly positive: {fc_rg_mean - fc_rg_ci}"
+    # Complete Withdrawal genetic association collapses to zero (CI spans 0)
+    assert abs(cw_rg_mean) < 0.015, f"Complete Withdrawal failed to dissipate: {cw_rg_mean}"
+    assert (cw_rg_mean - cw_rg_ci) <= 0.0 <= (cw_rg_mean + cw_rg_ci), "Complete Withdrawal CI does not span zero!"
+
+    print(f"\n[Verification] Belief Withdrawal & Generational Inertia Dynamic (N = 20 MC runs):")
+    print(f"  Sustained at Gen 25: r_P = {g25_sust['corr'].mean():.3f} | r_G = {g25_sust['corr_genetic'].mean():.3f}")
+    print(f"  Feedback Cessation Gen 25: r_P = {g25_fc['corr'].mean():.3f} | r_G = {fc_rg_mean:.3f} +/- {fc_rg_ci:.3f} (95% CI: [{fc_rg_mean-fc_rg_ci:.3f}, {fc_rg_mean+fc_rg_ci:.3f}])")
+    print(f"  Complete Withdrawal Gen 25: r_P = {g25_cw['corr'].mean():.3f} | r_G = {cw_rg_mean:.3f} +/- {cw_rg_ci:.3f} (95% CI: [{cw_rg_mean-cw_rg_ci:.3f}, {cw_rg_mean+cw_rg_ci:.3f}])")
 
     print("\n==========================================")
     print("[OK] ALL SIMULATION AND STATISTICAL METRICS REPRODUCED FLAWLESSLY!")

@@ -381,14 +381,27 @@ def generate_clean_figures():
         'Complete_Withdrawal': 'Complete Withdrawal at Gen 10'
     }
 
-    grouped6 = df_exp6.groupby(['scenario', 'gen']).agg({'corr': 'mean', 'corr_genetic': 'mean'}).reset_index()
+    grouped6 = df_exp6.groupby(['scenario', 'gen']).agg(
+        r_p_mean=('corr', 'mean'),
+        r_p_std=('corr', 'std'),
+        r_p_count=('corr', 'count'),
+        r_g_mean=('corr_genetic', 'mean'),
+        r_g_std=('corr_genetic', 'std'),
+        r_g_count=('corr_genetic', 'count')
+    ).reset_index()
+
+    grouped6['r_p_ci'] = 1.96 * (grouped6['r_p_std'] / np.sqrt(grouped6['r_p_count'].clip(lower=1)))
+    grouped6['r_g_ci'] = 1.96 * (grouped6['r_g_std'] / np.sqrt(grouped6['r_g_count'].clip(lower=1)))
 
     for sc in scenarios:
         sub = grouped6[grouped6['scenario'] == sc]
+        # Shaded 95% confidence intervals
+        ax_dyn.fill_between(sub['gen'], sub['r_p_mean'] - sub['r_p_ci'], sub['r_p_mean'] + sub['r_p_ci'],
+                            color=sc_colors[sc], alpha=0.15)
         # Phenotypic line (solid)
-        ax_dyn.plot(sub['gen'], sub['corr'], color=sc_colors[sc], linewidth=1.8, label=sc_labels[sc])
+        ax_dyn.plot(sub['gen'], sub['r_p_mean'], color=sc_colors[sc], linewidth=1.8, label=sc_labels[sc])
         # Genetic line (dotted)
-        ax_dyn.plot(sub['gen'], sub['corr_genetic'], color=sc_colors[sc], linewidth=1.5, linestyle=':')
+        ax_dyn.plot(sub['gen'], sub['r_g_mean'], color=sc_colors[sc], linewidth=1.5, linestyle=':')
 
     ax_dyn.axvline(10, color='black', linestyle='--', alpha=0.7)
     ax_dyn.text(10.2, 0.135, 'Intervention\n(Gen 10)', fontsize=7.5, color='black', fontweight='bold')
@@ -410,13 +423,19 @@ def generate_clean_figures():
     # -------------------------------------------------------------
     # Package into figures_JASSS.zip for journal upload
     # -------------------------------------------------------------
-    zip_path = os.path.join(PAPER_DIR, "figures_JASSS.zip")
-    with zipfile.ZipFile(zip_path, 'w') as zf:
+    zip_path_fig = os.path.join(FIGURES_DIR, "figures_JASSS.zip")
+    with zipfile.ZipFile(zip_path_fig, 'w') as zf:
         zf.write(fig1_path, arcname="fig1_assortative_mating.png")
         zf.write(fig2_path, arcname="fig2_population_stratification.png")
         zf.write(fig3_path, arcname="fig3_social_feedback.png")
         zf.write(fig4_path, arcname="fig4_model_comparisons.png")
-    print(f"Packaged figures archive at: {zip_path}")
+    print(f"Packaged figures archive at: {zip_path_fig}")
+
+    if os.path.exists(PAPER_DIR):
+        import shutil
+        zip_path_paper = os.path.join(PAPER_DIR, "figures_JASSS.zip")
+        shutil.copy2(zip_path_fig, zip_path_paper)
+        print(f"Copied figures archive to: {zip_path_paper}")
 
 
 def main():

@@ -22,7 +22,7 @@ This repository hosts the official open-science replication package for our comp
 2. **Subpopulation stratification and panmictic intermarriage** ($\Delta$)
 3. **Social labeling and developmental socialization feedback** ($\beta$)
 
-Furthermore, we investigate counterfactual **cultural belief withdrawal**, demonstrating how phenotypic feedback decays immediately upon cessation of socialization, while latent genetic linkage disequilibrium accumulated via assortative mating exhibits multi-generational inertia.
+Furthermore, we investigate counterfactual **cultural belief withdrawal**, demonstrating how phenotypic feedback decays immediately upon cessation of socialization, while latent cross-trait genetic-component associations (between the ABO locus and polygenic breeding values) accumulated via assortative mating exhibit multi-generational inertia.
 
 ---
 
@@ -139,9 +139,9 @@ The table below summarizes the exact empirical results replicated across 5 indep
 
 ## 🔄 Cultural Belief Withdrawal & Generational Inertia
 
-In Experiment 6, cultural beliefs ($\alpha = 0.15, \beta = 0.10$) are active for the first 10 generations, and counterfactually withdrawn at Generation 10:
-- **Complete Withdrawal ($\alpha = 0, \beta = 0$):** Phenotypic correlation collapses from $0.121$ to $0.008$ at Generation 11, dissipating to $-0.002$ by Generation 25 under panmixia.
-- **Feedback Cessation ($\beta = 0$, $\alpha = 0.15$ maintained):** Expressed correlation drops immediately to $0.032$, converging onto the latent genetic correlation ($r_G = 0.038$). This genetic linkage disequilibrium persists across subsequent generations ($r_G \approx 0.033$), demonstrating generational inertia.
+In Experiment 6, cultural beliefs ($\alpha = 0.15, \beta = 0.10$) are active for the first 10 generations, and counterfactually withdrawn at Generation 10 ($N = 20$ independent Monte Carlo replications with 95% confidence intervals):
+- **Complete Withdrawal ($\alpha = 0, \beta = 0$):** Phenotypic correlation collapses quasi-instantaneously to $r_P = 0.009 \pm 0.007$ at Generation 11, dissipating to $r_P = -0.002 \pm 0.008$ (95% CI $[-0.011, 0.006]$) and $r_G = -0.005 \pm 0.007$ (95% CI $[-0.012, 0.002]$) by Generation 25 under panmixia.
+- **Feedback Cessation ($\beta = 0$, $\alpha = 0.15$ maintained):** Expressed correlation drops immediately to $r_P = 0.022 \pm 0.008$ at Generation 11, unmasking the underlying genetic-component association ($r_G = 0.034 \pm 0.007$). Because mate choice continues to sort on phenotypic personality, this latent cross-trait genetic association persists stably across subsequent cohorts ($r_G = 0.032 \pm 0.007$, with 95% CI $[0.026, 0.039]$ strictly excluding zero at Generation 25), demonstrating generational inertia.
 
 ---
 
