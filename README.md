@@ -126,18 +126,3 @@ python src/analytics.py
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
----
-
-## ✍️ Citation
-
-If you use this model or code in your research, please cite:
-
-```bibtex
-@article{kim2026bloodtypeabm,
-  author    = {Kim, Suhyun},
-  title     = {Can Cultural Beliefs Generate Spurious Blood-Type--Personality Associations? An Agent-Based Simulation and Causal Modeling of the Blood-Type Personality Myth},
-  journal   = {Journal of Artificial Societies and Social Simulation},
-  year      = {2026},
-  note      = {Submitted}
-}
-```
