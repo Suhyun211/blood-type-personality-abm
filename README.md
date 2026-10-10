@@ -139,9 +139,9 @@ The table below summarizes the exact empirical results replicated across 5 indep
 
 ## 🔄 Cultural Belief Withdrawal & Generational Inertia
 
-In Experiment 6, cultural beliefs ($\alpha = 0.15, \beta = 0.10$) are active for the first 10 generations, and counterfactually withdrawn at Generation 10 ($N = 20$ independent Monte Carlo replications with 95% confidence intervals):
-- **Complete Withdrawal ($\alpha = 0, \beta = 0$):** Phenotypic correlation collapses quasi-instantaneously to $r_P = 0.009 \pm 0.007$ at Generation 11, dissipating to $r_P = -0.002 \pm 0.008$ (95% CI $[-0.011, 0.006]$) and $r_G = -0.005 \pm 0.007$ (95% CI $[-0.012, 0.002]$) by Generation 25 under panmixia.
-- **Feedback Cessation ($\beta = 0$, $\alpha = 0.15$ maintained):** Expressed correlation drops immediately to $r_P = 0.022 \pm 0.008$ at Generation 11, unmasking the underlying genetic-component association ($r_G = 0.034 \pm 0.007$). Because mate choice continues to sort on phenotypic personality, this latent cross-trait genetic association persists stably across subsequent cohorts ($r_G = 0.032 \pm 0.007$, with 95% CI $[0.026, 0.039]$ strictly excluding zero at Generation 25), demonstrating generational inertia.
+In Experiment 6, cultural beliefs ($\alpha = 0.15, \beta = 0.10$) are active for the first 10 generations, and counterfactually withdrawn at Generation 10 ($N = 20$ independent Monte Carlo replications with explicit standard deviations, standard errors, and 95% Student's $t$-confidence intervals):
+- **Complete Withdrawal ($\alpha = 0, \beta = 0$):** Phenotypic correlation collapses quasi-instantaneously to $r_P = 0.009$ ($\text{SD} = 0.015$, 95% CI $[0.003, 0.016]$) at Generation 11, dissipating to $r_P = -0.002$ ($\text{SD} = 0.019$, 95% CI $[-0.011, 0.007]$) and $r_G = -0.005$ ($\text{SD} = 0.016$, 95% CI $[-0.013, 0.002]$) by Generation 25 under panmixia.
+- **Feedback Cessation ($\beta = 0$, $\alpha = 0.15$ maintained):** Expressed correlation drops immediately to $r_P = 0.022$ ($\text{SD} = 0.019$, 95% CI $[0.013, 0.031]$) at Generation 11, unmasking the underlying genetic-component association ($r_G = 0.034$, $\text{SD} = 0.017$, 95% CI $[0.026, 0.041]$). Because mate choice continues to sort on phenotypic personality, this latent cross-trait genetic association persists stably across subsequent cohorts ($r_G = 0.032$, $\text{SD} = 0.015$, $\text{SE} = 0.0033$, with 95% $t$-CI $[0.025, 0.039]$ strictly excluding zero at Generation 25; margin of error $t_{19} \times \text{SE} = \pm 0.0070$), demonstrating generational inertia.
 
 ---
 

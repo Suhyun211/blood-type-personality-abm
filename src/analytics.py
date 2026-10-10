@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
+from scipy import stats
 
 # Set styling
 plt.style.use('seaborn-v0_8-whitegrid' if 'seaborn-v0_8-whitegrid' in plt.style.available else 'default')
@@ -390,8 +391,10 @@ def generate_clean_figures():
         r_g_count=('corr_genetic', 'count')
     ).reset_index()
 
-    grouped6['r_p_ci'] = 1.96 * (grouped6['r_p_std'] / np.sqrt(grouped6['r_p_count'].clip(lower=1)))
-    grouped6['r_g_ci'] = 1.96 * (grouped6['r_g_std'] / np.sqrt(grouped6['r_g_count'].clip(lower=1)))
+    df_dof = grouped6['r_p_count'].clip(lower=2) - 1
+    t_val = stats.t.ppf(0.975, df=df_dof)
+    grouped6['r_p_ci'] = t_val * (grouped6['r_p_std'] / np.sqrt(grouped6['r_p_count'].clip(lower=1)))
+    grouped6['r_g_ci'] = t_val * (grouped6['r_g_std'] / np.sqrt(grouped6['r_g_count'].clip(lower=1)))
 
     for sc in scenarios:
         sub = grouped6[grouped6['scenario'] == sc]

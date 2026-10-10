@@ -145,11 +145,19 @@ def verify_results(base_dir):
     g25_fc = df_bw[(df_bw['scenario'] == 'Feedback_Cessation') & (df_bw['gen'] == 25)]
     g25_cw = df_bw[(df_bw['scenario'] == 'Complete_Withdrawal') & (df_bw['gen'] == 25)]
     
-    # 95% CIs
+    # 95% Student's t-CIs (df = N - 1 = 19, t_crit = 2.093)
+    from scipy import stats
+    t_crit = stats.t.ppf(0.975, df=len(g25_fc)-1)
+    
     fc_rg_mean = g25_fc['corr_genetic'].mean()
-    fc_rg_ci = 1.96 * (g25_fc['corr_genetic'].std() / np.sqrt(len(g25_fc)))
+    fc_rg_sd = g25_fc['corr_genetic'].std(ddof=1)
+    fc_rg_se = fc_rg_sd / np.sqrt(len(g25_fc))
+    fc_rg_ci = t_crit * fc_rg_se
+    
     cw_rg_mean = g25_cw['corr_genetic'].mean()
-    cw_rg_ci = 1.96 * (g25_cw['corr_genetic'].std() / np.sqrt(len(g25_cw)))
+    cw_rg_sd = g25_cw['corr_genetic'].std(ddof=1)
+    cw_rg_se = cw_rg_sd / np.sqrt(len(g25_cw))
+    cw_rg_ci = t_crit * cw_rg_se
 
     # Feedback Cessation maintains latent genetic association significantly above zero
     assert (fc_rg_mean - fc_rg_ci) > 0.020, f"Feedback Cessation 95% CI lower bound not strictly positive: {fc_rg_mean - fc_rg_ci}"
@@ -159,8 +167,8 @@ def verify_results(base_dir):
 
     print(f"\n[Verification] Belief Withdrawal & Generational Inertia Dynamic (N = 20 MC runs):")
     print(f"  Sustained at Gen 25: r_P = {g25_sust['corr'].mean():.3f} | r_G = {g25_sust['corr_genetic'].mean():.3f}")
-    print(f"  Feedback Cessation Gen 25: r_P = {g25_fc['corr'].mean():.3f} | r_G = {fc_rg_mean:.3f} +/- {fc_rg_ci:.3f} (95% CI: [{fc_rg_mean-fc_rg_ci:.3f}, {fc_rg_mean+fc_rg_ci:.3f}])")
-    print(f"  Complete Withdrawal Gen 25: r_P = {g25_cw['corr'].mean():.3f} | r_G = {cw_rg_mean:.3f} +/- {cw_rg_ci:.3f} (95% CI: [{cw_rg_mean-cw_rg_ci:.3f}, {cw_rg_mean+cw_rg_ci:.3f}])")
+    print(f"  Feedback Cessation Gen 25: r_P = {g25_fc['corr'].mean():.3f} (SD={g25_fc['corr'].std(ddof=1):.3f}) | r_G = {fc_rg_mean:.3f} (SD={fc_rg_sd:.3f}, SE={fc_rg_se:.4f}, 95% t-CI: [{fc_rg_mean-fc_rg_ci:.3f}, {fc_rg_mean+fc_rg_ci:.3f}])")
+    print(f"  Complete Withdrawal Gen 25: r_P = {g25_cw['corr'].mean():.3f} (SD={g25_cw['corr'].std(ddof=1):.3f}) | r_G = {cw_rg_mean:.3f} (SD={cw_rg_sd:.3f}, SE={cw_rg_se:.4f}, 95% t-CI: [{cw_rg_mean-cw_rg_ci:.3f}, {cw_rg_mean+cw_rg_ci:.3f}])")
 
     print("\n==========================================")
     print("[OK] ALL SIMULATION AND STATISTICAL METRICS REPRODUCED FLAWLESSLY!")
